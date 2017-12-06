@@ -1,13 +1,16 @@
 FROM hypriot/rpi-alpine
-MAINTAINER zepptron
+MAINTAINER zepptron <https://github.com/zepptron>
+
+ENV VER="v2.0.0" \
+    TAR="prometheus-2.0.0.linux-armv7.tar.gz"
 
 RUN apk update && \
-    apk add curl && \
-    apk add tar && \
+    apk add --no-cache curl && \
+    apk add --no-cache tar && \
     mkdir -p /root/prometheus && \
-    curl -sSLO https://github.com/prometheus/prometheus/releases/download/v2.0.0/prometheus-2.0.0.linux-armv7.tar.gz && \
-    tar -xvf prometheus-2.0.0.linux-armv7.tar.gz -C /root/prometheus/ --strip-components=1 && \
-    rm prometheus-2.0.0.linux-armv7.tar.gz
+    curl -sSLO https://github.com/prometheus/prometheus/releases/download/$VER/$TAR && \
+    tar -xvf $TAR -C /root/prometheus/ --strip-components=1 && \
+    rm $TAR
 
 WORKDIR /root/prometheus
 
@@ -21,7 +24,7 @@ RUN mkdir -p /usr/share/prometheus && \
 
 EXPOSE 9090
 VOLUME [ "/nfs/prometheus/data" ]
-WORKDIR /
+
 ENTRYPOINT [ "/usr/bin/prometheus" ]
 CMD ["--config.file=/etc/prometheus/prometheus.yml", \
      "--storage.tsdb.path=/nfs/prometheus/data", \
